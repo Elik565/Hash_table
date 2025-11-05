@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 typedef struct HTNode {
     char* key;
     char* value;
@@ -11,4 +13,8 @@ typedef struct HashTable {
 
 HTNode* create_node(const char* key, const char* value);
 
-HashTable* create_table(const int size);
+HashTable* create_table(const size_t size);
+
+void free_node(HTNode* node);
+
+void free_table(HashTable* table);

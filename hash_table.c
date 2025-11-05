@@ -1,6 +1,5 @@
 #include "hash_table.h"
 #include <string.h>
-#include <stdlib.h>
 #include <stdio.h>
 
 HTNode* create_node(const char* key, const char* value) {
@@ -14,15 +13,32 @@ HTNode* create_node(const char* key, const char* value) {
     return node;
 }
 
-HashTable* create_table(const int size) {
-    HashTable* hash_table = malloc(sizeof(HashTable));
-    hash_table->size = size;
-    hash_table->count = 0;  
-    hash_table->node_array = calloc(size, sizeof(HTNode));
+HashTable* create_table(const size_t size) {
+    HashTable* table = malloc(sizeof(HashTable));
+    table->size = size;
+    table->count = 0;  
+    table->node_array = calloc(size, sizeof(HTNode));
 
     for (size_t i = 0; i < size; ++i) {
-        hash_table->node_array[i] = NULL;
+        table->node_array[i] = NULL;
     }
 
-    return hash_table;
+    return table;
+}
+
+void free_node(HTNode* node) {
+    free(node->key);
+    free(node->value);
+    free(node);
+}
+
+void free_table(HashTable* table) {
+    for (size_t i = 0; i < table->size; ++i) {
+        if (table->node_array[i] != NULL) {
+            free_node(table->node_array[i]);
+        }
+    }
+
+    free(table->node_array);
+    free(table);
 }
