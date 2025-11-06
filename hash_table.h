@@ -8,12 +8,16 @@ typedef struct HTNode {
 typedef struct HashTable {
     HTNode** node_array;
     int size;
-    int count;
+    int count_nodes;
 } HashTable;
 
 HTNode* create_node(const char* key, const char* value);
 
 HashTable* create_table(const size_t size);
+
+size_t hash_djb2(const char* key);
+
+void insert(HashTable* table, const char* key, const char* value);
 
 void free_node(HTNode* node);
 
