@@ -9,6 +9,7 @@ HTNode* create_node(const char* key, const char* value) {
 
     strcpy(node->key, key);
     strcpy(node->value, value);
+    node->next_node = NULL;
 
     return node;
 }
@@ -39,42 +40,35 @@ size_t hash_djb2(const char* key) {
     return hash;
 }
 
-void handle_collision(HTNode* current_node, HTNode* node) {
-    // Moving to the last node in the chain
-    while (current_node->next_node != NULL) {
-        current_node = current_node->next_node;
-    }
-
-    current_node->next_node = node;
-}
-
 void insert(HashTable* table, const char* key, char* value) {
-    HTNode* node = create_node(key, value);
     size_t id = hash_djb2(key) % table->size;
     
     HTNode* current_node = table->node_array[id];
     if (current_node == NULL) {  // there is no collision
-        if (table->count_nodes >= table->size) {  // table is full
-            printf("ERROR: when inserting, there was no place in the hash table\n");
-            free_node(node);
+        table->node_array[id] = create_node(key, value);
+        table->count_nodes++;
+        return;
+    }
+
+    // There is collision
+    HTNode* tmp = current_node;
+    while (1) {
+        if (strcmp(tmp->key, key) == 0) {  // we only need to update value
+            free(tmp->value);
+            tmp->value = strdup(value);
             return;
         }
 
-        // Regular insert
-        table->node_array[id] = node;
-        table->count_nodes++;
-    } else {  // There is collision
-        if (strcmp(current_node->key, key) == 0) {  // we only need to update value
-            strcpy(current_node->value, value);
-        } else {
-            handle_collision(current_node, node);
-            table->count_nodes++;
-        }
+        if (tmp->next_node == NULL) break;
+        tmp = tmp->next_node;
     }
+
+    tmp->next_node = create_node(key, value);
+    table->count_nodes++;
 }
 
-void print_ht(const HashTable* table, const size_t node_limit) {
-    for (size_t i = 0; i < table->size && i < node_limit; ++i) {
+void print_ht(const HashTable* table) {
+    for (size_t i = 0; i < table->size && i < 10; ++i) {
         printf("[%zu]: ", i);
 
         HTNode* node = table->node_array[i];
@@ -100,8 +94,11 @@ void free_node(HTNode* node) {
 
 void free_table(HashTable* table) {
     for (size_t i = 0; i < table->size; ++i) {
-        if (table->node_array[i] != NULL) {
-            free_node(table->node_array[i]);
+        HTNode* node = table->node_array[i];
+        while (node) {
+            HTNode* next = node->next_node;
+            free_node(node);
+            node = next;
         }
     }
 

@@ -18,11 +18,9 @@ HashTable* create_table(const size_t size);
 
 size_t hash_djb2(const char* key);
 
-void handle_collision(HTNode* current_node, HTNode* node);
-
 void insert(HashTable* table, const char* key, char* value);
 
-void print_ht(const HashTable* table, const size_t node_limit);
+void print_ht(const HashTable* table);
 
 void free_node(HTNode* node);
 
