@@ -39,7 +39,16 @@ size_t hash_djb2(const char* key) {
     return hash;
 }
 
-void insert(HashTable* table, const char* key, const char* value) {
+void handle_collision(HTNode* current_node, HTNode* node) {
+    // Moving to the last node in the chain
+    while (current_node->next_node != NULL) {
+        current_node = current_node->next_node;
+    }
+
+    current_node->next_node = node;
+}
+
+void insert(HashTable* table, const char* key, char* value) {
     HTNode* node = create_node(key, value);
     size_t id = hash_djb2(key) % table->size;
     
@@ -54,7 +63,14 @@ void insert(HashTable* table, const char* key, const char* value) {
         // Regular insert
         table->node_array[id] = node;
         table->count_nodes++;
-    }    
+    } else {  // There is collision
+        if (strcmp(current_node->key, key) == 0) {  // we only need to update value
+            strcpy(current_node->value, value);
+        } else {
+            handle_collision(current_node, node);
+            table->count_nodes++;
+        }
+    }
 }
 
 void print_ht(const HashTable* table, const size_t node_limit) {
@@ -67,7 +83,12 @@ void print_ht(const HashTable* table, const size_t node_limit) {
             continue;
         }
 
-        printf("%s - %s\n", node->key, node->value);
+        while (node->next_node != NULL) {
+            printf("%s (%s) -> ", node->key, node->value);
+            node = node->next_node;
+        }
+
+        printf("%s (%s)\n", node->key, node->value);
     }
 }
 
