@@ -3,10 +3,12 @@
 #include <math.h>
 
 void main() {
-    HashTable* ht = create_table(1);
+    HashTable* ht = create_table(5);
 
     insert(ht, "apple", "5");
     insert(ht, "orange", "3");
+
+    print_ht(ht, 5);
 
     return;
 }

@@ -19,6 +19,8 @@ size_t hash_djb2(const char* key);
 
 void insert(HashTable* table, const char* key, const char* value);
 
+void print_ht(const HashTable* table, const size_t node_limit);
+
 void free_node(HTNode* node);
 
 void free_table(HashTable* table);

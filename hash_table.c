@@ -57,6 +57,20 @@ void insert(HashTable* table, const char* key, const char* value) {
     }    
 }
 
+void print_ht(const HashTable* table, const size_t node_limit) {
+    for (size_t i = 0; i < table->size && i < node_limit; ++i) {
+        printf("[%zu]: ", i);
+
+        HTNode* node = table->node_array[i];
+        if (node == NULL) {
+            printf("NULL\n");
+            continue;
+        }
+
+        printf("%s - %s\n", node->key, node->value);
+    }
+}
+
 void free_node(HTNode* node) {
     free(node->key);
     free(node->value);
