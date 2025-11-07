@@ -43,28 +43,44 @@ size_t hash_djb2(const char* key) {
 void insert(HashTable* table, const char* key, char* value) {
     size_t id = hash_djb2(key) % table->size;
     
-    HTNode* current_node = table->node_array[id];
-    if (current_node == NULL) {  // there is no collision
+    HTNode* node = table->node_array[id];
+    if (node == NULL) {  // there is no collision
         table->node_array[id] = create_node(key, value);
         table->count_nodes++;
         return;
     }
 
     // There is collision
-    HTNode* tmp = current_node;
-    while (1) {
-        if (strcmp(tmp->key, key) == 0) {  // we only need to update value
-            free(tmp->value);
-            tmp->value = strdup(value);
+    HTNode* prev = NULL;
+    while (node) {
+        if (strcmp(node->key, key) == 0) {  // we only need to update value
+            free(node->value);
+            node->value = strdup(value);
             return;
         }
 
-        if (tmp->next_node == NULL) break;
-        tmp = tmp->next_node;
+        prev = node;
+        node = node->next_node;
     }
 
-    tmp->next_node = create_node(key, value);
+    prev->next_node = create_node(key, value);
     table->count_nodes++;
+}
+
+void print_search(const HashTable* table, const char* key) {
+    size_t id = hash_djb2(key) % table->size;
+    HTNode* node = table->node_array[id];
+
+    while (node) {
+        if (strcmp(node->key, key) == 0) {
+            printf("Found by id = %zu: key = %s, value = %s\n", id, key, node->value);
+            return;
+        }
+
+        node = node->next_node;
+    }
+
+    printf("Key '%s' not found\n");
 }
 
 void print_ht(const HashTable* table) {
@@ -77,13 +93,14 @@ void print_ht(const HashTable* table) {
             continue;
         }
 
-        while (node->next_node != NULL) {
+        while (node->next_node) {
             printf("%s (%s) -> ", node->key, node->value);
             node = node->next_node;
         }
 
         printf("%s (%s)\n", node->key, node->value);
     }
+    printf("\n");
 }
 
 void free_node(HTNode* node) {

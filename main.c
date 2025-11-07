@@ -15,6 +15,8 @@ void main() {
 
     print_ht(ht);
 
+    print_search(ht, "pear");
+
     free_table(ht);
 
     return;

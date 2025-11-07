@@ -20,6 +20,8 @@ size_t hash_djb2(const char* key);
 
 void insert(HashTable* table, const char* key, char* value);
 
+void print_search(const HashTable* table, const char* key);
+
 void print_ht(const HashTable* table);
 
 void free_node(HTNode* node);
